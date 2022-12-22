@@ -5,9 +5,9 @@ import fr.imt.coffee.machine.exception.CannotMakeCremaWithSimpleCoffeeMachine;
 import fr.imt.coffee.machine.exception.CoffeeTypeCupDifferentOfCoffeeTypeTankException;
 import fr.imt.coffee.machine.exception.LackOfWaterInTankException;
 import fr.imt.coffee.machine.exception.MachineNotPluggedException;
-import fr.imt.coffee.storage.cupboard.coffee.type.CoffeeType;
-import fr.imt.coffee.storage.cupboard.container.*;
-import fr.imt.coffee.storage.cupboard.exception.CupNotEmptyException;
+import fr.imt.cours.storage.cupboard.coffee.type.CoffeeType;
+import fr.imt.cours.storage.cupboard.container.*;
+import fr.imt.cours.storage.cupboard.exception.CupNotEmptyException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

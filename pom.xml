@@ -11,6 +11,7 @@
 
     <modules>
         <module>coffee-machine</module>
+        <module>storage</module>
     </modules>
 
     <properties>
@@ -24,7 +25,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
-                    <source>18</source>
+                    <source>19</source>
                     <failOnError>false</failOnError>
                     <doclint>none</doclint>
                     <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
