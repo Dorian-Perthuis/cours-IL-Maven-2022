@@ -11,4 +11,9 @@ public class CoffeeMug extends CoffeeContainer{
     public CoffeeMug(Mug mug, CoffeeType coffeeType) {
         super(mug, coffeeType);
     }
+
+    @Override
+    public String toString() {
+        return super.toString() + "\n" + "Container type : Mug";
+    }
 }

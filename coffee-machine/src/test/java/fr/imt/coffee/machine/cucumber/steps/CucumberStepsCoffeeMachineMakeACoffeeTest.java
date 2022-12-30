@@ -1,10 +1,7 @@
 package fr.imt.coffee.machine.cucumber.steps;
 
 import fr.imt.coffee.machine.CoffeeMachine;
-import fr.imt.coffee.machine.exception.CannotMakeCremaWithSimpleCoffeeMachine;
-import fr.imt.coffee.machine.exception.CoffeeTypeCupDifferentOfCoffeeTypeTankException;
-import fr.imt.coffee.machine.exception.LackOfWaterInTankException;
-import fr.imt.coffee.machine.exception.MachineNotPluggedException;
+import fr.imt.coffee.machine.exception.*;
 import fr.imt.cours.storage.cupboard.coffee.type.CoffeeType;
 import fr.imt.cours.storage.cupboard.container.*;
 import fr.imt.cours.storage.cupboard.exception.CupNotEmptyException;
@@ -53,12 +50,12 @@ public class CucumberStepsCoffeeMachineMakeACoffeeTest {
     }
 
     @And("I add {double} liter of {string} in the bean tank")
-    public void iAddLitersOfCoffeeBeans(double beanVolume, String coffeeType) {
+    public void iAddLitersOfCoffeeBeans(double beanVolume, String coffeeType) throws CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere {
         coffeeMachine.addCoffeeInBeanTank(beanVolume, CoffeeType.valueOf(coffeeType));
     }
 
     @And("I made a coffee {string}")
-    public void iMadeACoffee(String coffeeType) throws InterruptedException, CupNotEmptyException, LackOfWaterInTankException, MachineNotPluggedException, CoffeeTypeCupDifferentOfCoffeeTypeTankException, CannotMakeCremaWithSimpleCoffeeMachine {
+    public void iMadeACoffee(String coffeeType) throws InterruptedException, CupNotEmptyException, LackOfWaterInTankException, MachineNotPluggedException, CoffeeTypeCupDifferentOfCoffeeTypeTankException, CannotMakeCremaWithSimpleCoffeeMachine, CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere {
         //On créé un mock de l'objet random
         Random randomMock = Mockito.mock(Random.class, Mockito.withSettings().withoutAnnotations());
         //On vient ensuite stubber la méthode nextGaussian pour pouvoir controler la valeur retournée

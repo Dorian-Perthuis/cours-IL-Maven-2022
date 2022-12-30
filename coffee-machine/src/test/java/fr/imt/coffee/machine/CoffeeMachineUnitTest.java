@@ -1,7 +1,8 @@
 package fr.imt.coffee.machine;
 
+import fr.imt.coffee.machine.exception.*;
 import fr.imt.cours.storage.cupboard.coffee.type.CoffeeType;
-import fr.imt.cours.storage.cupboard.container.Cup;
+import fr.imt.cours.storage.cupboard.container.*;
 import fr.imt.cours.storage.cupboard.exception.CupNotEmptyException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -55,6 +56,7 @@ public class CoffeeMachineUnitTest {
 
         Assertions.assertTrue(coffeeMachineUnderTest.isOutOfOrder());
         assertThat(true, is(coffeeMachineUnderTest.isOutOfOrder()));
+
     }
 
     /**
@@ -94,9 +96,29 @@ public class CoffeeMachineUnitTest {
     public void testPlugMachine(){
         Assertions.assertFalse(coffeeMachineUnderTest.isPlugged());
 
+
         coffeeMachineUnderTest.plugToElectricalPlug();
 
         Assertions.assertTrue(coffeeMachineUnderTest.isPlugged());
+    }
+    @Test
+    public void testMakeACoffeeMachnineNotPlugException(){
+        Cup mockCup = Mockito.mock(Cup.class);
+        Mockito.when(mockCup.isEmpty()).thenReturn(false);
+
+        Assertions.assertThrows(MachineNotPluggedException.class, ()->{
+            coffeeMachineUnderTest.makeACoffee(mockCup, CoffeeType.MOKA);
+        }, "You must plug your coffee machine.");
+    }
+    @Test
+    public void testMakeACoffeLackOfWaterInTankException(){
+        Cup mockCup = Mockito.mock(Cup.class);
+        Mockito.when(mockCup.getCapacity()).thenReturn(1.0);
+        coffeeMachineUnderTest.plugToElectricalPlug();
+
+        Assertions.assertThrows(LackOfWaterInTankException.class, ()->{
+            coffeeMachineUnderTest.makeACoffee(mockCup, CoffeeType.MOKA);
+        }, "You must add more water in the water tank.");
     }
 
     /**
@@ -118,7 +140,92 @@ public class CoffeeMachineUnitTest {
         //On teste à la fois le type d'exception levée mais aussi le message de l'exception
         Assertions.assertThrows(CupNotEmptyException.class, ()->{
                 coffeeMachineUnderTest.makeACoffee(mockCup, CoffeeType.MOKA);
-            });
+            }, "The container given is not empty.");
+    }
+
+    @Test
+    public void testMakeACoffeeCoffeeTypeCupDifferentOfCoffeeTypeTankException() throws CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere {
+        Cup mockCup = Mockito.mock(Cup.class);
+        Mockito.when(mockCup.getCapacity()).thenReturn(1.0);
+        Mockito.when(mockCup.isEmpty()).thenReturn(true);
+        coffeeMachineUnderTest.addWaterInTank(5.0);
+        coffeeMachineUnderTest.addCoffeeInBeanTank(5.0, CoffeeType.ARABICA);
+        coffeeMachineUnderTest.plugToElectricalPlug();
+
+        Assertions.assertThrows(CoffeeTypeCupDifferentOfCoffeeTypeTankException.class, ()->{
+            coffeeMachineUnderTest.makeACoffee(mockCup, CoffeeType.MOKA);
+        }, "The type of coffee to be made in the cup is different from that in the tank.");
+    }
+
+    @Test
+    public void testMakeACoffeeCannotMakeCremaWithSimpleCoffeeMachine() throws CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere {
+        Cup mockCup = Mockito.mock(Cup.class);
+        Mockito.when(mockCup.getCapacity()).thenReturn(1.0);
+        Mockito.when(mockCup.isEmpty()).thenReturn(true);
+        coffeeMachineUnderTest.addWaterInTank(5.0);
+        coffeeMachineUnderTest.addCoffeeInBeanTank(5.0, CoffeeType.ARABICA);
+        coffeeMachineUnderTest.plugToElectricalPlug();
+
+        Assertions.assertThrows(CannotMakeCremaWithSimpleCoffeeMachine.class, ()->{
+            coffeeMachineUnderTest.makeACoffee(mockCup, CoffeeType.ARABICA_CREMA);
+        }, "You cannot make an espresso with a CoffeeMachine, please use EspressoCoffeeMachine");
+
+    }
+
+    @Test
+    public void testAddWaterInTank(){
+        double waterVolume = 5;
+
+        coffeeMachineUnderTest.addWaterInTank(waterVolume);
+
+        Assertions.assertEquals(waterVolume,coffeeMachineUnderTest.getWaterTank().getActualVolume());
+    }
+
+    @Test
+    public void testAddWaterInTankWaterTankFull(){
+        double waterVolume = 15;
+
+        coffeeMachineUnderTest.addWaterInTank(waterVolume);
+
+        Assertions.assertEquals(coffeeMachineUnderTest.getWaterTank().getMaxVolume(),coffeeMachineUnderTest.getWaterTank().getActualVolume());
+    }
+
+    @Test
+    public void testAddCoffeeInBeanTankWrongBeanException() throws CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere {
+
+        double coffeeVolume = 3;
+        coffeeMachineUnderTest.addCoffeeInBeanTank(coffeeVolume,CoffeeType.MOKA);
+
+        //CoffeeTypeCupDifferentOfCoffeeTypeTankException
+        Assertions.assertThrows(CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere.class, ()->{
+            coffeeMachineUnderTest.addCoffeeInBeanTank(coffeeVolume, CoffeeType.ARABICA);
+        }, "Wrong coffee than the coffee already in the tank");
+    }
+
+    @Test void testMakeACoffeeCup() throws CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere, CoffeeTypeCupDifferentOfCoffeeTypeTankException, LackOfWaterInTankException, CupNotEmptyException, CannotMakeCremaWithSimpleCoffeeMachine, InterruptedException, MachineNotPluggedException {
+        Cup cup = new Cup(0.15);
+        CoffeeCup coffeeCupExpected = new CoffeeCup(0.15,CoffeeType.ARABICA);
+        coffeeCupExpected.setEmpty(false);
+
+        coffeeMachineUnderTest.addWaterInTank(5.0);
+        coffeeMachineUnderTest.addCoffeeInBeanTank(5.0, CoffeeType.ARABICA);
+        coffeeMachineUnderTest.plugToElectricalPlug();
+
+        CoffeeContainer coffeeCupActual = coffeeMachineUnderTest.makeACoffee(cup,CoffeeType.ARABICA);
+        Assertions.assertEquals(coffeeCupExpected.toString(),coffeeCupActual.toString());
+    }
+
+    @Test void testMakeACoffeeMug() throws CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere, CoffeeTypeCupDifferentOfCoffeeTypeTankException, LackOfWaterInTankException, CupNotEmptyException, CannotMakeCremaWithSimpleCoffeeMachine, InterruptedException, MachineNotPluggedException {
+        Mug mug = new Mug(0.30);
+        CoffeeMug coffeeMugExpected = new CoffeeMug(0.30,CoffeeType.ARABICA);
+        coffeeMugExpected.setEmpty(false);
+
+        coffeeMachineUnderTest.addWaterInTank(5.0);
+        coffeeMachineUnderTest.addCoffeeInBeanTank(5.0, CoffeeType.ARABICA);
+        coffeeMachineUnderTest.plugToElectricalPlug();
+
+        CoffeeContainer coffeeMugActual = coffeeMachineUnderTest.makeACoffee(mug,CoffeeType.ARABICA);
+        Assertions.assertEquals(coffeeMugExpected.toString(),coffeeMugActual.toString());
     }
 
     @AfterEach

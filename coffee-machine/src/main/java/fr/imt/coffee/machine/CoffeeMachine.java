@@ -4,6 +4,7 @@ import fr.imt.coffee.machine.component.*;
 import fr.imt.coffee.machine.exception.CannotMakeCremaWithSimpleCoffeeMachine;
 import fr.imt.coffee.machine.exception.CoffeeTypeCupDifferentOfCoffeeTypeTankException;
 import fr.imt.coffee.machine.exception.LackOfWaterInTankException;
+import fr.imt.coffee.machine.exception.CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere;
 import fr.imt.coffee.machine.exception.MachineNotPluggedException;
 import fr.imt.cours.storage.cupboard.coffee.type.CoffeeType;
 import fr.imt.cours.storage.cupboard.container.*;
@@ -62,7 +63,7 @@ public class CoffeeMachine {
         this.waterTank.increaseVolumeInTank(waterVolume);
     }
 
-    public void addCoffeeInBeanTank(double coffeeVolume, CoffeeType coffeeType){
+    public void addCoffeeInBeanTank(double coffeeVolume, CoffeeType coffeeType) throws CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere {
         beanTank.increaseCoffeeVolumeInTank(coffeeVolume, coffeeType);
     }
 
@@ -75,15 +76,16 @@ public class CoffeeMachine {
      * @param container Contenant pour faire couler le café
      * @param coffeeType Type de café dans l'énumération CoffeeType.java
      * @return Contenant non vide avec son type de café
-     * @throws LackOfWaterInTankException Exception à lever lorsque que l'on manque d'eau dans le réservoir, message "You must plug your coffee machine to an electrical plug."
-     * @throws MachineNotPluggedException Exception levée lorsque que la machine n'est pas branchée, message : "You must add more water in the water tank."
+     * @throws LackOfWaterInTankException Exception à lever lorsque que l'on manque d'eau dans le réservoir, message "You must add more water in the water tank."
+     * @throws MachineNotPluggedException Exception levée lorsque que la machine n'est pas branchée, message : "You must plug your coffee machine to an electrical plug."
      * @throws CupNotEmptyException Exception levée lorsque le contenant donné en paramètre n'est pas vide, message : "The container given is not empty."
      * @throws InterruptedException Exception levée lorsqu'un problème survient dans les Threads lors du sleep
      * @throws CoffeeTypeCupDifferentOfCoffeeTypeTankException Exception levée lorsque le café souhaité est différent de celui chargé dans le réservoir de la cafetière
      * @throws CannotMakeCremaWithSimpleCoffeeMachine Exception levée lorsque vous souhaitez faire un café type Crema avec un une machine classique
+     * @throws CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere Exeception Levée lorsque le café ajouté dans le tank est différent de celui déjà présent : "Wrong coffee than the coffee already in the tank"
      */
-    public CoffeeContainer makeACoffee(Container container, CoffeeType coffeeType) throws LackOfWaterInTankException, InterruptedException, MachineNotPluggedException, CupNotEmptyException, CoffeeTypeCupDifferentOfCoffeeTypeTankException, CannotMakeCremaWithSimpleCoffeeMachine {
-        if(isPlugged){
+    public CoffeeContainer makeACoffee(Container container, CoffeeType coffeeType) throws LackOfWaterInTankException, InterruptedException, MachineNotPluggedException, CupNotEmptyException, CoffeeTypeCupDifferentOfCoffeeTypeTankException, CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere, CannotMakeCremaWithSimpleCoffeeMachine {
+        if(!isPlugged){
             throw new MachineNotPluggedException("You must plug your coffee machine.");
         }
 
@@ -92,10 +94,10 @@ public class CoffeeMachine {
         }
 
         if (!container.isEmpty()){
-            throw new LackOfWaterInTankException("You must add more water in the water tank.");
+            throw new CupNotEmptyException("The container given is not empty.");
         }
 
-        if(coffeeType != this.beanTank.getBeanCoffeeType()){
+        if(!coffeeType.toString().contains(this.beanTank.getBeanCoffeeType().toString())){
             throw new CoffeeTypeCupDifferentOfCoffeeTypeTankException("The type of coffee to be made in the cup is different from that in the tank.");
         }
 
@@ -120,7 +122,7 @@ public class CoffeeMachine {
         if(container instanceof Mug)
             coffeeContainer = new CoffeeMug((Mug) container, coffeeType);
 
-        coffeeContainer.setEmpty(true);
+        coffeeContainer.setEmpty(false);
         return coffeeContainer;
     }
 

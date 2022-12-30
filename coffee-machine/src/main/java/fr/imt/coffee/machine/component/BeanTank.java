@@ -1,5 +1,6 @@
 package fr.imt.coffee.machine.component;
 
+import fr.imt.coffee.machine.exception.CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere;
 import fr.imt.cours.storage.cupboard.coffee.type.CoffeeType;
 
 public class BeanTank extends Tank{
@@ -18,9 +19,16 @@ public class BeanTank extends Tank{
         this.beanCoffeeType = beanCoffeeType;
     }
 
-    public void increaseCoffeeVolumeInTank(double coffeeVolume, CoffeeType coffeeType){
-        this.increaseVolumeInTank(coffeeVolume);
-        this.beanCoffeeType = coffeeType;
+    public void increaseCoffeeVolumeInTank(double coffeeVolume, CoffeeType coffeeType) throws CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere {
+        if(this.getActualVolume() != 0){
+            if(this.beanCoffeeType != coffeeType) {
+                throw new CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere("Wrong coffee than the coffee already in the tank");
+            }
+            this.increaseVolumeInTank(coffeeVolume);
+        }else{
+            this.increaseVolumeInTank(coffeeVolume);
+            this.beanCoffeeType = coffeeType;
+        }
     }
     public CoffeeType getBeanCoffeeType() {
         return beanCoffeeType;

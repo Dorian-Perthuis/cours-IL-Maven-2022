@@ -30,7 +30,11 @@ public class Tank {
      * @param volumeToIncrease Volume de matière à ajouter dans le réservoir
      */
     public void increaseVolumeInTank(double volumeToIncrease){
-        this.actualVolume += volumeToIncrease;
+        if((this.actualVolume+volumeToIncrease) > this.maxVolume){
+            this.actualVolume = this.maxVolume;
+        }else{
+            this.actualVolume += volumeToIncrease;
+        }
     }
 
     public double getMaxVolume() {

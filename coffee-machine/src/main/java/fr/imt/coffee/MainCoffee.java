@@ -1,10 +1,7 @@
 package fr.imt.coffee;
 
 import fr.imt.coffee.machine.CoffeeMachine;
-import fr.imt.coffee.machine.exception.CannotMakeCremaWithSimpleCoffeeMachine;
-import fr.imt.coffee.machine.exception.CoffeeTypeCupDifferentOfCoffeeTypeTankException;
-import fr.imt.coffee.machine.exception.LackOfWaterInTankException;
-import fr.imt.coffee.machine.exception.MachineNotPluggedException;
+import fr.imt.coffee.machine.exception.*;
 import fr.imt.cours.storage.cupboard.FabricCupboardContainer;
 import fr.imt.cours.storage.cupboard.coffee.type.CoffeeType;
 import fr.imt.cours.storage.cupboard.container.Container;
@@ -24,7 +21,7 @@ public class MainCoffee {
     //INFO, WARNING, DEBUG, ERROR...
     public static final Logger logger = LogManager.getLogger(MainCoffee.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws CoffeeTypeAddedDifferentThanTheCoffeeTypeAlreadyHere {
 
         FabricCupboardContainer fabricCupboardContainer = FabricCupboardContainer.getFabricContainerInstance();
         CoffeeMachine coffeeMachine =
